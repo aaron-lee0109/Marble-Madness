@@ -155,8 +155,10 @@ int StudentWorld::move()
 
 void StudentWorld::cleanUp()
 {
-    if (player != nullptr)
+    if (player != nullptr) {
         delete player;
+        player = nullptr;
+    }
     for (list<Actor*>::iterator i = actors.begin(); i != actors.end(); ) {
         delete* i;
         i = actors.erase(i);

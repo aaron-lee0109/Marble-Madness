@@ -638,8 +638,8 @@ void Factories::doSomething()
 {
 	int count = 0;
 	int x = getX(), y = getY();
-	int x_min = max(x - 3, 1), x_max = min(x + 3, VIEW_WIDTH - 1);
-	int y_min = max(y - 3, 1), y_max = min(y + 3, VIEW_HEIGHT - 1);
+	int x_min = max(x - 3, 1), x_max = min(x + 3, VIEW_WIDTH - 2);
+	int y_min = max(y - 3, 1), y_max = min(y + 3, VIEW_HEIGHT - 2);
 	for (int i = x_min; i <= x_max; i++) {
 		for (int j = y_min; j <= y_max; j++) {
 			Actor* object = getWorld()->objectAtLocation(i, j);
