@@ -155,7 +155,6 @@ int StudentWorld::move()
 
 void StudentWorld::cleanUp()
 {
-    cout << "cleanup" << endl;
     if (player != nullptr)
         delete player;
     for (list<Actor*>::iterator i = actors.begin(); i != actors.end(); ) {
