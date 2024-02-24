@@ -42,7 +42,6 @@ public:
 	virtual bool canShootOver() const;
 private:
 	int m_health;
-	int m_totalHealth;
 };
 
 class StudentWorld;
@@ -59,7 +58,6 @@ public:
 
 private:
 	int m_ammo;
-
 };
 
 class Bots : public AttackableActor
@@ -71,10 +69,8 @@ public:
 	void increaseTickCount();
 	virtual bool canMoveForward(int x, int y);
 	bool clearLineOfSight(int x1, int y1, int x2, int y2);
-
 private:
 	int tickCount;
-
 };
 
 class RageBots : public Bots
@@ -83,9 +79,7 @@ public:
 	RageBots(StudentWorld* sw, int id, int x, int y, int dir, int health);
 	void doSomething();
 	virtual void damage();
-
 private:
-
 };
 
 class ThiefBots : public Bots
@@ -105,7 +99,6 @@ protected:
 private:
 	Actor* loot;
 	int distanceLeft;
-
 };
 
 class MeanThiefBots : public ThiefBots
@@ -115,7 +108,6 @@ public:
 	void doSomething();
 	virtual void damage();
 private:
-
 };
 
 class Factories : public Actor
@@ -137,7 +129,6 @@ public:
 	virtual void doSomething();
 
 private:
-
 };
 
 class Exits : public Actor
@@ -148,28 +139,23 @@ public:
 	virtual bool canStepOn() const;
 private:
 	bool revealed;
-
 };
 
 class Walls : public Actor
 {
 public:
 	Walls(StudentWorld* sw, int id, int x, int y, int dir);
-	virtual bool isActive() const;
 	virtual bool canShootOver() const;
 private:
-
 };
 
 class Marbles : public AttackableActor
 {
 public:
 	Marbles(StudentWorld* sw, int id, int x, int y, int dir, int health);
-	virtual bool isActive() const;
 	virtual void damage();
 	virtual bool canFillPit() const;
 private:
-
 };
 
 class Pits : public Actor
@@ -179,9 +165,7 @@ public:
 	virtual void doSomething();
 	virtual bool canHaveMarbleOver() const;
 private:
-
 };
-
 
 class Goodies : public Actor
 {
@@ -192,6 +176,7 @@ public:
 	virtual bool canBeThieved() const;
 	virtual bool isActive() const;
 	virtual void setIsActive(bool active);
+	void handleCollect(int addScore);
 private:
 	bool active;
 };
@@ -205,7 +190,6 @@ public:
 	virtual bool isActive() const;
 	virtual void setIsActive(bool active);
 private:
-
 };
 
 class ExtraLifeGoodies : public Goodies
@@ -214,7 +198,6 @@ public:
 	ExtraLifeGoodies(StudentWorld* sw, int id, int x, int y, int dir);
 	virtual void doSomething();
 private:
-
 };
 
 class RestoreHealthGoodies : public Goodies
@@ -223,7 +206,6 @@ public:
 	RestoreHealthGoodies(StudentWorld* sw, int id, int x, int y, int dir);
 	virtual void doSomething();
 private:
-
 };
 
 class AmmoGoodies : public Goodies
@@ -232,7 +214,6 @@ public:
 	AmmoGoodies(StudentWorld* sw, int id, int x, int y, int dir);
 	virtual void doSomething();
 private:
-
 };
 
 #endif // ACTOR_H_

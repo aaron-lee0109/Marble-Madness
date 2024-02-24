@@ -22,7 +22,7 @@ StudentWorld::StudentWorld(string assetPath)
 }
 
 StudentWorld::~StudentWorld() {
-    cleanUp(); // causes out of bounds error message
+    cleanUp();
 }
 
 int StudentWorld::init()
@@ -32,11 +32,10 @@ int StudentWorld::init()
     ostringstream lev;
     lev.fill('0');
     lev << "level" << setw(2) << getLevel() << ".txt";
-    //lev << "level" << setw(2) << 3 << ".txt";
     string l = lev.str();
     Level::LoadResult result = level.loadLevel(l);
 
-    // If the next file is not in proper format
+    // If the next file is not a maze file
     if (result == Level::load_fail_file_not_found)
         return GWSTATUS_LEVEL_ERROR;
 
@@ -168,11 +167,16 @@ void StudentWorld::cleanUp()
     m_crystalsLeft = 0;
 }
 
+// returns pointer to the player
 Avatar* StudentWorld::getPlayer()
 {
     return player;
 }
 
+// returns pointer to the Actor at location x, y
+// nullptr if no Actor at x, y
+// logic in how the Actors are added to the list (push_front vs push_back) ensure
+// that when multiple objects are on the same x, y the right object is returned
 Actor* StudentWorld::objectAtLocation(int x, int y)
 {
     if (player->getX() == x && player->getY() == y)
@@ -184,6 +188,8 @@ Actor* StudentWorld::objectAtLocation(int x, int y)
     return nullptr;
 }
 
+// returns pointer to Goodie at location x, y
+// nullptr if no Goodie at x, y
 Actor* StudentWorld::lootAtLocation(int x, int y)
 {
     for (list<Actor*>::iterator i = actors.begin(); i != actors.end(); i++) {
@@ -193,6 +199,7 @@ Actor* StudentWorld::lootAtLocation(int x, int y)
     return nullptr;
 }
 
+// handles setting the Display Text seen in the game
 void StudentWorld::setDisplayText()
 {
     int score = getScore();

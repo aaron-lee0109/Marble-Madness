@@ -93,7 +93,7 @@ bool Actor::madeByFactory() const
 
 // AttackableActor method implementations
 AttackableActor::AttackableActor(StudentWorld* sw, int id, int x, int y, int dir, int health)
-	: Actor(sw, id, x, y, dir), m_health(health), m_totalHealth(health)
+	: Actor(sw, id, x, y, dir), m_health(health)
 {
 	setShootable(1);
 }
@@ -132,6 +132,7 @@ Avatar::Avatar(StudentWorld* sw, int id, int x, int y, int dir, int health, int 
 
 void Avatar::doSomething()
 {
+	// check if alive
 	if (!this->getIsAlive())
 		return;
 
@@ -169,18 +170,21 @@ void Avatar::doSomething()
 					y = getY() + 1;
 					break;
 				}
+				// create pea
 				getWorld()->addItem(new Peas(getWorld(), IID_PEA, x, y, dir));
 			}
 			break;
 		case KEY_PRESS_LEFT:
 			setDirection(GraphObject::left);
 			x = getX(), y = getY();
+			// marble logic
 			actor1 = getWorld()->objectAtLocation(x - 1, y);
 			if (actor1 != nullptr && actor1->canFillPit()) {
 				actor2 = getWorld()->objectAtLocation(x - 2, y);
 				if (actor2 == nullptr || actor2->canHaveMarbleOver())
 					actor1->moveTo(x - 2, y);
 			}
+			// otherwise check if can move forward
 			if (canMoveForward(getX() - 1, getY()))
 				this->moveTo(getX() - 1, getY());
 			break;
@@ -188,36 +192,42 @@ void Avatar::doSomething()
 		case KEY_PRESS_RIGHT:
 			setDirection(GraphObject::right);
 			x = getX(), y = getY();
+			// checking marble logic
 			actor1 = getWorld()->objectAtLocation(x + 1, y);
 			if (actor1 != nullptr && actor1->canFillPit()) {
 				actor2 = getWorld()->objectAtLocation(x + 2, y);
 				if (actor2 == nullptr || actor2->canHaveMarbleOver())
 					actor1->moveTo(x + 2, y);
 			}
+			// otherwise check if can move forward
 			if (canMoveForward(getX() + 1, getY()))
 				this->moveTo(getX() + 1, getY());
 			break;
 		case KEY_PRESS_DOWN:
 			setDirection(GraphObject::down);
 			x = getX(), y = getY();
+			// checking marble logic
 			actor1 = getWorld()->objectAtLocation(x, y - 1);
 			if (actor1 != nullptr && actor1->canFillPit()) {
 				actor2 = getWorld()->objectAtLocation(x, y - 2);
 				if (actor2 == nullptr || actor2->canHaveMarbleOver())
 					actor1->moveTo(x, y - 2);
 			}
+			// check if can move forward
 			if (canMoveForward(getX(), getY() - 1))
 				this->moveTo(getX(), getY() - 1);
 			break;
 		case KEY_PRESS_UP:
 			setDirection(GraphObject::up);
 			x = getX(), y = getY();
+			// checking marble logic
 			actor1 = getWorld()->objectAtLocation(x, y + 1);
 			if (actor1 != nullptr && actor1->canFillPit()) {
 				actor2 = getWorld()->objectAtLocation(x, y + 2);
 				if (actor2 == nullptr || actor2->canHaveMarbleOver())
 					actor1->moveTo(x, y + 2);
 			}
+			// check if can move forward
 			if (canMoveForward(getX(), getY() + 1))
 				this->moveTo(getX(), getY() + 1);
 			break;
@@ -294,6 +304,7 @@ bool Bots::canMoveForward(int x, int y)
 }
 
 bool Bots::clearLineOfSight(int x, int y, int playerX, int playerY)
+// helper function used by bots who can shoot to determine if the line of sight is clear
 {
 	// Check if there are obstacles between bot and player
 	if (x == playerX) {
@@ -328,9 +339,11 @@ RageBots::RageBots(StudentWorld* sw, int id, int x, int y, int dir, int health)
 
 void RageBots::doSomething()
 {
+	// check if alive
 	if (!getIsAlive())
 		return;
 
+	// check if can move this tick
 	increaseTickCount();
 	if (getTickCount() % movementSpeed() != 0)
 		return;
@@ -341,6 +354,9 @@ void RageBots::doSomething()
 	int playerY = getWorld()->getPlayer()->getY();
 	int dir = getDirection();
 
+	// for each direction, determine if bot can shoot
+	// otherwise determine if bot can move forward
+	// otherwise turn around
 	switch (dir) {
 	case GraphObject::up:
 		if (x == playerX && playerY > y && clearLineOfSight(x, y, playerX, playerY)) {
@@ -448,10 +464,10 @@ void ThiefBots::damage()
 {
 	setHealth(getHealth() - 2);
 	if (getHealth() <= 0) {
-		if (loot != nullptr) {
-			loot->moveTo(getX(), getY());
-			loot->setVisible(true);
-			loot->setIsActive(true);
+		if (getLoot() != nullptr) {
+			getLoot()->moveTo(getX(), getY());
+			getLoot()->setVisible(true);
+			getLoot()->setIsActive(true);
 		}
 		setIsAlive(false);
 		getWorld()->playSound(SOUND_ROBOT_DIE);
@@ -477,9 +493,12 @@ int ThiefBots::getDistanceLeft() const
 }
 
 bool ThiefBots::move()
+// helper function to help facilitate movement of ThiefBots (and child class MeanThiefBots)
 {
 	int dir = getDirection();
 	int x = getX(), y = getY();
+	// for each direction move forward if able and return true
+	// otherwise return false
 	switch (dir) {
 	case GraphObject::up:
 		if (canMoveForward(x, y + 1)) {
@@ -618,7 +637,6 @@ void MeanThiefBots::damage()
 			getLoot()->setVisible(true);
 			getLoot()->setIsActive(true);
 		}
-
 		setIsAlive(false);
 		getWorld()->playSound(SOUND_ROBOT_DIE);
 		getWorld()->increaseScore(20);
@@ -638,8 +656,10 @@ void Factories::doSomething()
 {
 	int count = 0;
 	int x = getX(), y = getY();
+	// get the boundaries of the square to check
 	int x_min = max(x - 3, 1), x_max = min(x + 3, VIEW_WIDTH - 2);
 	int y_min = max(y - 3, 1), y_max = min(y + 3, VIEW_HEIGHT - 2);
+	// count theif bots in the square
 	for (int i = x_min; i <= x_max; i++) {
 		for (int j = y_min; j <= y_max; j++) {
 			Actor* object = getWorld()->objectAtLocation(i, j);
@@ -647,6 +667,7 @@ void Factories::doSomething()
 				count++;
 		}
 	}
+	// handle adding thief bots if applicable
 	if (count < 3) {
 		Actor* object = getWorld()->objectAtLocation(x, y);
 		if (object != nullptr && !object->madeByFactory() && randInt(1, 50) == 1) {
@@ -676,16 +697,21 @@ void Peas::doSomething()
 	if (!this->getIsAlive())
 		return;
 	int x = getX(), y = getY();
+
+	// Get object at the location of the pea
 	Actor* object = getWorld()->objectAtLocation(x, y);
-	if (object->getShootable() == 1) {
+	// Handle the case where the object is shootable
+	if (object != nullptr && object->getShootable() == 1) {
 		object->damage();
 		setIsAlive(false);
 		return;
 	}
-	else if (object->getShootable() == 3) {
+	// Handle the case where the object is an obstacle
+	else if (object != nullptr && object->getShootable() == 3) {
 		setIsAlive(false);
 		return;
 	}
+	// Handle the cases where the pea can go over/through the object or there is no object
 	else {
 		int dir = getDirection();
 		int x, y;
@@ -708,6 +734,20 @@ void Peas::doSomething()
 			break;
 		}
 		moveTo(x, y);
+
+		//// Get object at the location of the pea
+		//object = getWorld()->objectAtLocation(x, y);
+		//// Handle the case where the object is shootable
+		//if (object != nullptr && object->getShootable() == 1) {
+		//	object->damage();
+		//	setIsAlive(false);
+		//	return;
+		//}
+		//// Handle the case where the object is an obstacle
+		//else if (object != nullptr && object->getShootable() == 3) {
+		//	setIsAlive(false);
+		//	return;
+		//}
 		return;
 	}
 }
@@ -726,11 +766,13 @@ Exits::Exits(StudentWorld* sw, int id, int x, int y, int dir)
 
 void Exits::doSomething()
 {
+	// Reveal the exit if all the crystals are collected
 	if (!revealed && getWorld()->getCrystalsLeft() <= 0) {
 		revealed = true;
 		setVisible(true);
 		getWorld()->playSound(SOUND_REVEAL_EXIT);
 	}
+	// Finish the level if the exit is revealed and the player reaches the exit
 	Actor* player = getWorld()->getPlayer();
 	if (revealed && player->getX() == getX() && player->getY() == getY()) {
 		getWorld()->playSound(SOUND_FINISHED_LEVEL);
@@ -752,11 +794,6 @@ Walls::Walls(StudentWorld* sw, int id, int x, int y, int dir)
 
 }
 
-bool Walls::isActive() const
-{
-	return false;
-}
-
 bool Walls::canShootOver() const
 {
 	return false;
@@ -767,11 +804,6 @@ Marbles::Marbles(StudentWorld* sw, int id, int x, int y, int dir, int health)
 	: AttackableActor(sw, id, x, y, dir, health)
 {
 
-}
-
-bool Marbles::isActive() const
-{
-	return false;
 }
 
 void Marbles::damage() {
@@ -797,6 +829,7 @@ void Pits::doSomething()
 	if (!this->getIsAlive())
 		return;
 	Actor* object = getWorld()->objectAtLocation(getX(), getY());
+	// Check if marble is on pit, remove pit and marble if so
 	if (object != nullptr && object->canFillPit()) {
 		setIsAlive(false);
 		object->setIsAlive(false);
@@ -841,6 +874,13 @@ void Goodies::setIsActive(bool active)
 	this->active = active;
 }
 
+void Goodies::handleCollect(int addScore)
+{
+	getWorld()->increaseScore(addScore);
+	setIsAlive(false);
+	getWorld()->playSound(SOUND_GOT_GOODIE);
+}
+
 // Crystals method implementations
 Crystals::Crystals(StudentWorld* sw, int id, int x, int y, int dir)
 	: Goodies(sw, id, x, y, dir)
@@ -852,10 +892,9 @@ void Crystals::doSomething()
 {
 	if (!getIsAlive())
 		return;
+	// Handle when the player collects a crystal
 	if (playerIsOn()) {
-		getWorld()->increaseScore(50);
-		setIsAlive(false);
-		getWorld()->playSound(SOUND_GOT_GOODIE);
+		handleCollect(50);
 		getWorld()->collectCrystal();
 	}
 }
@@ -886,10 +925,9 @@ void ExtraLifeGoodies::doSomething()
 {
 	if (!getIsAlive())
 		return;
+	// Handle when the player collects an extra life goodie
 	if (playerIsOn()) {
-		getWorld()->increaseScore(1000);
-		setIsAlive(false);
-		getWorld()->playSound(SOUND_GOT_GOODIE);
+		handleCollect(1000);
 		getWorld()->incLives();
 	}
 }
@@ -906,10 +944,9 @@ void RestoreHealthGoodies::doSomething()
 {
 	if (!getIsAlive())
 		return;
+	// Handle when the player collects a restore health goodie
 	if (playerIsOn()) {
-		getWorld()->increaseScore(500);
-		setIsAlive(false);
-		getWorld()->playSound(SOUND_GOT_GOODIE);
+		handleCollect(500);
 		getWorld()->getPlayer()->setHealth(20);
 	}
 }
@@ -925,10 +962,9 @@ void AmmoGoodies::doSomething()
 {
 	if (!getIsAlive())
 		return;
+	// Handle when player collects an ammo goodie
 	if (playerIsOn()) {
-		getWorld()->increaseScore(100);
-		setIsAlive(false);
-		getWorld()->playSound(SOUND_GOT_GOODIE);
+		handleCollect(100);
 		getWorld()->getPlayer()->addAmmo(20);
 	}
 }
