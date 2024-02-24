@@ -7,7 +7,6 @@
 #include <string>
 #include <list>
 
-// Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
 class Actor;
 class Avatar;
 
@@ -22,8 +21,10 @@ public:
 
   Avatar* getPlayer();
   Actor* objectAtLocation(int x, int y);
+  Actor* lootAtLocation(int x, int y);
   void addItem(Actor* item);
   void addItemToFront(Actor* item);
+  int getBonus() const;
   int getCrystalsLeft() const;
   void collectCrystal();
   void setFinishedLevel(bool finish);
@@ -33,7 +34,7 @@ private:
 	std::list<Actor*> actors;
 	int m_bonus;
 	int m_crystalsLeft;
-	bool finishedLevel;
+	bool levelIsFinished;
 
 	// Additional helper functions
 	void setDisplayText();

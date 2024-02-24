@@ -8,8 +8,6 @@
 #include <string>
 using namespace std;
 
-// Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
-
 // Actor method implementations
 Actor::Actor(StudentWorld* sw, int id, int x, int y, int dir)
 	: GraphObject(id, x, y, dir), m_world(sw), isAlive(true)
@@ -154,7 +152,6 @@ void Avatar::doSomething()
 				m_ammo--;
 
 				int dir = getDirection();
-				int x, y;
 				switch (dir) {
 				case GraphObject::left:
 					x = getX() - 1;
@@ -423,9 +420,8 @@ void ThiefBots::doSomething()
 		return;
 
 	// check if bot can steal a goodie
-	Actor* object = getWorld()->objectAtLocation(getX(), getY());
-	if (getLoot() == nullptr && object != nullptr
-		&& object->canBeThieved() && randInt(1, 10) <= 1) {
+	Actor* object = getWorld()->lootAtLocation(getX(), getY());
+	if (getLoot() == nullptr && object != nullptr && randInt(1, 10) == 1) {
 		setLoot(object);
 		getLoot()->setVisible(false);
 		getLoot()->setIsActive(false);
@@ -589,9 +585,8 @@ void MeanThiefBots::doSomething()
 	}
 
 	// check if bot can steal a goodie
-	Actor* object = getWorld()->objectAtLocation(getX(), getY());
-	if (getLoot() == nullptr && object != nullptr
-		&& object->canBeThieved() && randInt(1, 10) <= 1) {
+	Actor* object = getWorld()->lootAtLocation(getX(), getY());
+	if (getLoot() == nullptr && object != nullptr && randInt(1, 10) == 1) {
 		setLoot(object);
 		getLoot()->setVisible(false);
 		getLoot()->setIsActive(false);
@@ -619,6 +614,12 @@ void MeanThiefBots::damage()
 {
 	setHealth(getHealth() - 2);
 	if (getHealth() <= 0) {
+		if (getLoot() != nullptr) {
+			getLoot()->moveTo(getX(), getY());
+			getLoot()->setVisible(true);
+			getLoot()->setIsActive(true);
+		}
+
 		setIsAlive(false);
 		getWorld()->playSound(SOUND_ROBOT_DIE);
 		getWorld()->increaseScore(20);
@@ -649,7 +650,7 @@ void Factories::doSomething()
 	}
 	if (count < 3) {
 		Actor* object = getWorld()->objectAtLocation(x, y);
-		if (object!= nullptr && !object->madeByFactory() && randInt(1,50) <= 1) {
+		if (object!= nullptr && !object->madeByFactory() && randInt(1,50) == 1) {
 			if (regularFactory)
 				getWorld()->addItemToFront(new ThiefBots(getWorld(), IID_THIEFBOT, x, y, GraphObject::right, 5));
 			else
@@ -735,6 +736,7 @@ void Exits::doSomething()
 	if (revealed && player->getX() == getX() && player->getY() == getY()) {
 		getWorld()->playSound(SOUND_FINISHED_LEVEL);
 		getWorld()->increaseScore(2000);
+		getWorld()->increaseScore(getWorld()->getBonus());
 		getWorld()->setFinishedLevel(true);
 	}
 }

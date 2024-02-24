@@ -14,16 +14,15 @@ GameWorld* createStudentWorld(string assetPath)
 	return new StudentWorld(assetPath);
 }
 
-// Students:  Add code to this file, StudentWorld.h, Actor.h, and Actor.cpp
 
 StudentWorld::StudentWorld(string assetPath)
-: GameWorld(assetPath), player(nullptr), m_bonus(1000), m_crystalsLeft(0), finishedLevel(false)
+: GameWorld(assetPath), player(nullptr), m_bonus(1000), m_crystalsLeft(0), levelIsFinished(false)
 {
 
 }
 
 StudentWorld::~StudentWorld() {
-    //cleanUp(); // causes out of bounds error message
+    cleanUp(); // causes out of bounds error message
 }
 
 int StudentWorld::init()
@@ -32,18 +31,18 @@ int StudentWorld::init()
     Level level(assetPath());
     ostringstream lev;
     lev.fill('0');
-    //lev << "level" << setw(2) << getLevel() << ".txt";
-    lev << "level" << setw(2) << 1 << ".txt";
+    lev << "level" << setw(2) << getLevel() << ".txt";
+    //lev << "level" << setw(2) << 2 << ".txt";
     string l = lev.str();
     Level::LoadResult result = level.loadLevel(l);
 
-    // If there is no level data file with the next number
-    if (result == Level::load_fail_file_not_found)
-        return GWSTATUS_PLAYER_WON;
-
     // If the next file is not in proper format
-    if (result == Level::load_fail_bad_format)
+    if (result == Level::load_fail_file_not_found)
         return GWSTATUS_LEVEL_ERROR;
+
+    // If there is no level data file with the next number
+    if (result == Level::load_fail_bad_format)
+        return GWSTATUS_PLAYER_WON;
 
     // Allocate and insert Actors
     for (int y = 0; y < VIEW_HEIGHT; y++) {
@@ -57,10 +56,10 @@ int StudentWorld::init()
                 player = new Avatar(this, IID_PLAYER, x, y, GraphObject::right, 20, 20);
                 break;
             case Level:: horiz_ragebot:
-                actors.push_back(new RageBots(this, IID_RAGEBOT, x, y, GraphObject::right, 10));
+                actors.push_front(new RageBots(this, IID_RAGEBOT, x, y, GraphObject::right, 10));
                 break;
             case Level::vert_ragebot:
-                actors.push_back(new RageBots(this, IID_RAGEBOT, x, y, GraphObject::down, 10));
+                actors.push_front(new RageBots(this, IID_RAGEBOT, x, y, GraphObject::down, 10));
                 break;
             case Level::thiefbot_factory:
                 actors.push_back(new Factories(this, IID_ROBOT_FACTORY, x, y, GraphObject::none, true));
@@ -117,7 +116,7 @@ int StudentWorld::move()
 
             if (!player->getIsAlive())
                 return GWSTATUS_PLAYER_DIED;
-            if (finishedLevel)
+            if (levelIsFinished)
                 return GWSTATUS_FINISHED_LEVEL;
         }
     }
@@ -139,7 +138,7 @@ int StudentWorld::move()
     // return the proper result
     if (!player->getIsAlive())
         return GWSTATUS_PLAYER_DIED;
-    if (finishedLevel)
+    if (levelIsFinished)
         return GWSTATUS_FINISHED_LEVEL;
     // if player did not finish level or die, continue game
     return GWSTATUS_CONTINUE_GAME;
@@ -152,6 +151,9 @@ void StudentWorld::cleanUp()
         delete* i;
         i = actors.erase(i);
     }
+    setFinishedLevel(false);
+    m_bonus = 1000;
+    m_crystalsLeft = 0;
 }
 
 Avatar* StudentWorld::getPlayer()
@@ -165,6 +167,15 @@ Actor* StudentWorld::objectAtLocation(int x, int y)
         return player;
     for (list<Actor*>::iterator i = actors.begin(); i != actors.end(); i++) {
         if ((*i)->getX() == x && (*i)->getY() == y)
+            return (*i);
+    }
+    return nullptr;
+}
+
+Actor* StudentWorld::lootAtLocation(int x, int y)
+{
+    for (list<Actor*>::iterator i = actors.begin(); i != actors.end(); i++) {
+        if ((*i)->canBeThieved() && (*i)->getX() == x && (*i)->getY() == y)
             return (*i);
     }
     return nullptr;
@@ -207,6 +218,11 @@ void StudentWorld::addItemToFront(Actor* item)
     actors.push_front(item);
 }
 
+int StudentWorld::getBonus() const
+{
+    return m_bonus;
+}
+
 int StudentWorld::getCrystalsLeft() const
 {
     return m_crystalsLeft;
@@ -219,5 +235,5 @@ void StudentWorld::collectCrystal()
 
 void StudentWorld::setFinishedLevel(bool finish)
 {
-    finishedLevel = finish;
+    levelIsFinished = finish;
 }
