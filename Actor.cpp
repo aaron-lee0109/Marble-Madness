@@ -20,7 +20,7 @@ void Actor::doSomething() {
 	return;
 }
 
-StudentWorld* Actor::getWorld() 
+StudentWorld* Actor::getWorld()
 {
 	return m_world;
 }
@@ -144,7 +144,6 @@ void Avatar::doSomething()
 		{
 		case KEY_PRESS_ESCAPE:
 			this->setIsAlive(false);
-			getWorld()->decLives();
 			break;
 		case KEY_PRESS_SPACE:
 			if (m_ammo > 0) {
@@ -185,9 +184,9 @@ void Avatar::doSomething()
 			if (canMoveForward(getX() - 1, getY()))
 				this->moveTo(getX() - 1, getY());
 			break;
-		
+
 		case KEY_PRESS_RIGHT:
-			setDirection(GraphObject::right);			
+			setDirection(GraphObject::right);
 			x = getX(), y = getY();
 			actor1 = getWorld()->objectAtLocation(x + 1, y);
 			if (actor1 != nullptr && actor1->canFillPit()) {
@@ -267,7 +266,7 @@ Bots::Bots(StudentWorld* sw, int id, int x, int y, int dir, int health)
 
 int Bots::movementSpeed()
 {
-	int ticks = (28 - (getWorld()->getLevel()))/4;
+	int ticks = (28 - (getWorld()->getLevel())) / 4;
 	if (ticks < 3)
 		ticks = 3;
 	return ticks;
@@ -324,7 +323,7 @@ bool Bots::clearLineOfSight(int x, int y, int playerX, int playerY)
 RageBots::RageBots(StudentWorld* sw, int id, int x, int y, int dir, int health)
 	: Bots(sw, id, x, y, dir, health)
 {
-	
+
 }
 
 void RageBots::doSomething()
@@ -650,7 +649,7 @@ void Factories::doSomething()
 	}
 	if (count < 3) {
 		Actor* object = getWorld()->objectAtLocation(x, y);
-		if (object!= nullptr && !object->madeByFactory() && randInt(1,50) == 1) {
+		if (object != nullptr && !object->madeByFactory() && randInt(1, 50) == 1) {
 			if (regularFactory)
 				getWorld()->addItemToFront(new ThiefBots(getWorld(), IID_THIEFBOT, x, y, GraphObject::right, 5));
 			else

@@ -11,12 +11,12 @@ using namespace std;
 
 GameWorld* createStudentWorld(string assetPath)
 {
-	return new StudentWorld(assetPath);
+    return new StudentWorld(assetPath);
 }
 
 
 StudentWorld::StudentWorld(string assetPath)
-: GameWorld(assetPath), player(nullptr), m_bonus(1000), m_crystalsLeft(0), levelIsFinished(false)
+    : GameWorld(assetPath), player(nullptr), m_bonus(1000), m_crystalsLeft(0), levelIsFinished(false)
 {
 
 }
@@ -32,7 +32,7 @@ int StudentWorld::init()
     ostringstream lev;
     lev.fill('0');
     lev << "level" << setw(2) << getLevel() << ".txt";
-    //lev << "level" << setw(2) << 2 << ".txt";
+    //lev << "level" << setw(2) << 3 << ".txt";
     string l = lev.str();
     Level::LoadResult result = level.loadLevel(l);
 
@@ -55,7 +55,7 @@ int StudentWorld::init()
             case Level::player:
                 player = new Avatar(this, IID_PLAYER, x, y, GraphObject::right, 20, 20);
                 break;
-            case Level:: horiz_ragebot:
+            case Level::horiz_ragebot:
                 actors.push_front(new RageBots(this, IID_RAGEBOT, x, y, GraphObject::right, 10));
                 break;
             case Level::vert_ragebot:
@@ -105,8 +105,11 @@ int StudentWorld::move()
 
     // Give player a chance to do something
     player->doSomething();
-    if (!player->getIsAlive())
+    if (!player->getIsAlive()) {
+        decLives();
+        playSound(SOUND_PLAYER_DIE);
         return GWSTATUS_PLAYER_DIED;
+    }
     // Give each actor a chance to do something
     for (list<Actor*>::iterator i = actors.begin(); i != actors.end(); i++) {
         // If actor is active
@@ -114,8 +117,11 @@ int StudentWorld::move()
             // Make a move
             (*i)->doSomething();
 
-            if (!player->getIsAlive())
+            if (!player->getIsAlive()) {
+                decLives();
+                playSound(SOUND_PLAYER_DIE);
                 return GWSTATUS_PLAYER_DIED;
+            }
             if (levelIsFinished)
                 return GWSTATUS_FINISHED_LEVEL;
         }
@@ -132,12 +138,15 @@ int StudentWorld::move()
     }
 
     // Reduce current bonus for the level by one
-    if(m_bonus > 0)
+    if (m_bonus > 0)
         m_bonus--;
-   
+
     // return the proper result
-    if (!player->getIsAlive())
+    if (!player->getIsAlive()) {
+        decLives();
+        playSound(SOUND_PLAYER_DIE);
         return GWSTATUS_PLAYER_DIED;
+    }
     if (levelIsFinished)
         return GWSTATUS_FINISHED_LEVEL;
     // if player did not finish level or die, continue game
@@ -146,7 +155,9 @@ int StudentWorld::move()
 
 void StudentWorld::cleanUp()
 {
-    delete player;
+    cout << "cleanup" << endl;
+    if (player != nullptr)
+        delete player;
     for (list<Actor*>::iterator i = actors.begin(); i != actors.end(); ) {
         delete* i;
         i = actors.erase(i);
@@ -203,7 +214,7 @@ void StudentWorld::setDisplayText()
     display << "Bonus: " << setw(4) << m_bonus;
 
     string d = display.str();
-    
+
     // Set Display
     setGameStatText(d);
 }

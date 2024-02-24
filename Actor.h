@@ -56,7 +56,7 @@ public:
 	void addAmmo(int add);
 	virtual bool canMoveForward(int x, int y);
 	virtual void damage();
-	
+
 private:
 	int m_ammo;
 
@@ -68,7 +68,7 @@ public:
 	Bots(StudentWorld* sw, int id, int x, int y, int dir, int health);
 	int movementSpeed();
 	int getTickCount() const;
-	void increaseTickCount(); 
+	void increaseTickCount();
 	virtual bool canMoveForward(int x, int y);
 	bool clearLineOfSight(int x1, int y1, int x2, int y2);
 
@@ -88,7 +88,7 @@ private:
 
 };
 
-class ThiefBots : public Bots 
+class ThiefBots : public Bots
 {
 public:
 	ThiefBots(StudentWorld* sw, int id, int x, int y, int dir, int health);

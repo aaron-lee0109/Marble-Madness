@@ -13,21 +13,21 @@ class Avatar;
 class StudentWorld : public GameWorld
 {
 public:
-  StudentWorld(std::string assetPath);
-  ~StudentWorld();
-  virtual int init();
-  virtual int move();
-  virtual void cleanUp();
+	StudentWorld(std::string assetPath);
+	~StudentWorld();
+	virtual int init();
+	virtual int move();
+	virtual void cleanUp();
 
-  Avatar* getPlayer();
-  Actor* objectAtLocation(int x, int y);
-  Actor* lootAtLocation(int x, int y);
-  void addItem(Actor* item);
-  void addItemToFront(Actor* item);
-  int getBonus() const;
-  int getCrystalsLeft() const;
-  void collectCrystal();
-  void setFinishedLevel(bool finish);
+	Avatar* getPlayer();
+	Actor* objectAtLocation(int x, int y);
+	Actor* lootAtLocation(int x, int y);
+	void addItem(Actor* item);
+	void addItemToFront(Actor* item);
+	int getBonus() const;
+	int getCrystalsLeft() const;
+	void collectCrystal();
+	void setFinishedLevel(bool finish);
 
 private:
 	Avatar* player;
