@@ -1,0 +1,26 @@
+1.
+The StudentWorld class has a function getPlayer() that returns a pointer to the player avatar.
+
+The Goodies class is the base class for the various Goodies. The Goodies class has a function playerIsOn() that returns true if the player is at the same location as the Goodie and false otherwise.
+
+Every time a Goodie's doSomething() function is called, it calls playerIsOn() to check if the player is at the same location as the Goodie. If the player is at the same location as the Goodie, the following occurs:
+
+The score is increased:
+Each Goodie has a corresponding amount to which the score will be increased. The StudentWorld class inherits the function increaseScore(int howMuch) that increases the score by howMuch. The Goodie class inerits the function getWorld() that returns a pointer to the StudentWorld to which the Goodie resides. Thus, getWorld()->increaseScore(int whatTheSpecSaysForThisGoodie) will increase the score.
+
+The Goodie is set to dead:
+The Goodie class inherits a function setIsAlive(bool alive) that sets the alive status of the Goodie. Thus, setIsAlive(false) is called to indicate that the Goodie the player has just collected is no longer "alive" in the game.
+
+A sound is played:
+When a Goodie is collected there is a specific sound to be played. The StudentWorld class inherits the function playSound(int soundID) that will play whatever sound the soundID responds to. Thus, getWorld()->playSound(SOUND_GOT_GOODIE) plays the sound that indicates the player has collected a Goodie.
+
+The specific purpose of the Goodie is implemented:
+The StudentWorld class inerits the function incLives() that increases the number of lives by one. The Avatar (player) class inherits the function setHealth(int health) that sets the health level of the player to the health that is passed to the function. The Avatar class has the function addAmmo(int add) that increases the player's ammo by add. Each Goodie has a specific purpose. For an extra life goodie, getWorld()->incLives() is called to add an extra life. For a restore health goodie, getPlayer()->setHealth(20) is called to reset the player's health level to what it started with (20). For an ammo goodie, getPlayer()->addAmmo(20) is called to increase the player's ammo by 20.
+
+After this, the Goodie has made its move for this tick. At the end of each tick, the StudentWorld's move() function will delete any Actors that are dead. If the Goodie was set to dead (because the player collected it) then the Goodie dissapears. Otherwise the Goodie continues existing and its doSomething() function will be called again at the next tick.
+
+2.
+I implemented all the functionality detailed in the spec. To my knowledge, there are no known bugs in my classes.
+
+3.
+No assumptions were made in the construction of this project. If the spec did not explicity say what to do in a specific situation, I ran the sample program provided and implemented the situation accordingly.
