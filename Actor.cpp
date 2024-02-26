@@ -687,7 +687,7 @@ bool Factories::canShootOver() const
 
 // Peas method implementations
 Peas::Peas(StudentWorld* sw, int id, int x, int y, int dir)
-	: Actor(sw, id, x, y, dir)
+	: Actor(sw, id, x, y, dir), first(true)
 {
 	setShootable(2);
 }
@@ -696,6 +696,11 @@ void Peas::doSomething()
 {
 	if (!this->getIsAlive())
 		return;
+	if (first) {
+		first = false;
+		return;
+	}
+
 	int x = getX(), y = getY();
 
 	// Get object at the location of the pea
@@ -735,19 +740,19 @@ void Peas::doSomething()
 		}
 		moveTo(x, y);
 
-		//// Get object at the location of the pea
-		//object = getWorld()->objectAtLocation(x, y);
-		//// Handle the case where the object is shootable
-		//if (object != nullptr && object->getShootable() == 1) {
-		//	object->damage();
-		//	setIsAlive(false);
-		//	return;
-		//}
-		//// Handle the case where the object is an obstacle
-		//else if (object != nullptr && object->getShootable() == 3) {
-		//	setIsAlive(false);
-		//	return;
-		//}
+		// Get object at the new location of the pea
+		object = getWorld()->objectAtLocation(x, y);
+		// Handle the case where the object is shootable
+		if (object != nullptr && object->getShootable() == 1) {
+			object->damage();
+			setIsAlive(false);
+			return;
+		}
+		// Handle the case where the object is an obstacle
+		else if (object != nullptr && object->getShootable() == 3) {
+			setIsAlive(false);
+			return;
+		}
 		return;
 	}
 }

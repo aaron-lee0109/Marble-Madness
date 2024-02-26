@@ -129,6 +129,7 @@ public:
 	virtual void doSomething();
 
 private:
+	bool first;
 };
 
 class Exits : public Actor
