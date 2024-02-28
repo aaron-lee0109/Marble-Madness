@@ -35,13 +35,13 @@ int StudentWorld::init()
     string l = lev.str();
     Level::LoadResult result = level.loadLevel(l);
 
+    // If there is no level data file with the next number
+    if (getLevel() == 100 || result == Level::load_fail_bad_format)
+        return GWSTATUS_PLAYER_WON;
+
     // If the next file is not a maze file
     if (result == Level::load_fail_file_not_found)
         return GWSTATUS_LEVEL_ERROR;
-
-    // If there is no level data file with the next number
-    if (result == Level::load_fail_bad_format)
-        return GWSTATUS_PLAYER_WON;
 
     // Allocate and insert Actors
     for (int y = 0; y < VIEW_HEIGHT; y++) {

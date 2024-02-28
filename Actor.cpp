@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <algorithm>
 using namespace std;
 
 // Actor method implementations
@@ -696,6 +697,7 @@ void Peas::doSomething()
 {
 	if (!this->getIsAlive())
 		return;
+	// ensure that the pea is first animated at its starting location
 	if (first) {
 		first = false;
 		return;
